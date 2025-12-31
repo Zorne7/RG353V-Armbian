@@ -91,7 +91,7 @@ then
         mv "output/logs/summary-docker-$id.md" $outdir/armbian-${i}-docker.summary
     done
 else 
-    ls userpatches/config-r36s-* | cut -d'-' -f2-4| cut -d'.' -f1
+    ls userpatches/config-*-* | cut -d'-' -f2-4| cut -d'.' -f1
 fi
 
 
