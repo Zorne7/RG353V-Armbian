@@ -70,12 +70,14 @@ then
     do
         rm -rf output/logs
         ./compile.sh $i
+        
+	device=$(echo $i|cut -d- -f2)
+
         img=$(find output -name "Armbian-*_${device}_*.img")
         log=$(find output -name log-build-*.log)
         id=$(echo $log| sed -E 's|.*log-build-(.*)\.log|\1|')
-        
+
         #armbian-${device}-noble-minimal
-        device=$(echo $i|cut -d- -f2)
         base=$(echo $i|cut -d- -f3)
         type=$(echo $i|cut -d- -f4)
         outdir=../localoutput/$now/$device/$base/$type
