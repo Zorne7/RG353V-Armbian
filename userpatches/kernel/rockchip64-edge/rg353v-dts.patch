@@ -1,0 +1,122 @@
+diff --git a/arch/arm64/boot/dts/rockchip/Makefile b/arch/arm64/boot/dts/rockchip/Makefile
+index 1234567..abcdef0 100644
+--- a/arch/arm64/boot/dts/rockchip/Makefile
++++ b/arch/arm64/boot/dts/rockchip/Makefile
+@@ -50,6 +50,7 @@ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3566-evb.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3566-evb1-v10.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3566-evb1-v10-ddr3-v10.dtb
++dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3566-rg353v.dtb
+
+diff --git a/arch/arm64/boot/dts/rockchip/rk3566-rg353v.dts b/arch/arm64/boot/dts/rockchip/rk3566-rg353v.dts
+new file mode 100644
+--- /dev/null
++++ b/arch/arm64/boot/dts/rockchip/rk3566-rg353v.dts
+@@ -0,0 +1,200 @@
+/dts-v1/;
+
+/include/ "rk3566.dtsi"
+
+/ {
+    model = "Anbernic RG353V";
+    compatible = "anbernic,rg353v", "rockchip,rk3566";
+
+    aliases {
+        serial0 = &uart2;
+        mmc0 = &sdmmc0;
+    };
+
+    chosen {
+        stdout-path = "serial2:1500000n8";
+    };
+};
+
+/* ------------------------- */
+/* CPU / PMIC / REGULATORS   */
+/* ------------------------- */
+
+&cpu0 { cpu-supply = <&vdd_cpu>; };
+&cpu1 { cpu-supply = <&vdd_cpu>; };
+&cpu2 { cpu-supply = <&vdd_cpu>; };
+&cpu3 { cpu-supply = <&vdd_cpu>; };
+
+/* PMIC RK817 */
+&i2c0 {
+    status = "okay";
+
+    pmic: pmic@20 {
+        compatible = "rockchip,rk817";
+        reg = <0x20>;
+        interrupt-parent = <&gpio0>;
+        interrupt-names = "irq";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pmic_int>;
+        #clock-cells = <1>;
+
+        regulators {
+            vdd_cpu: DCDC_REG1 {
+                regulator-name = "vdd_cpu";
+                regulator-min-microvolt = <800000>;
+                regulator-max-microvolt = <1400000>;
+                regulator-always-on;
+                regulator-boot-on;
+            };
+
+            vdd_logic: DCDC_REG2 {
+                regulator-name = "vdd_logic";
+                regulator-min-microvolt = <800000>;
+                regulator-max-microvolt = <1400000>;
+                regulator-always-on;
+                regulator-boot-on;
+            };
+
+            vcc_ddr: DCDC_REG3 {
+                regulator-name = "vcc_ddr";
+                regulator-always-on;
+                regulator-boot-on;
+            };
+
+            vcc_3v3: DCDC_REG4 {
+                regulator-name = "vcc_3v3";
+                regulator-min-microvolt = <3300000>;
+                regulator-max-microvolt = <3300000>;
+                regulator-always-on;
+                regulator-boot-on;
+            };
+        };
+    };
+};
+
+/* ------------------------- */
+/* UART2 (console)           */
+/* ------------------------- */
+
+&uart2 {
+    status = "okay";
+    pinctrl-names = "default";
+    pinctrl-0 = <&uart2m0_xfer>;
+};
+
+/* ------------------------- */
+/* SD/MMC (rootfs)           */
+/* ------------------------- */
+
+&sdmmc0 {
+    status = "okay";
+    bus-width = <4>;
+    cap-sd-highspeed;
+    disable-wp;
+    vmmc-supply = <&vcc_3v3>;
+    vqmmc-supply = <&vdd_logic>;
+    pinctrl-names = "default";
+    pinctrl-0 = <&sdmmc0_clk &sdmmc0_cmd &sdmmc0_bus4>;
+};
+
+/* ------------------------- */
+/* PINCTRL                   */
+/* ------------------------- */
+
+&pinctrl {
+    pmic_int: pmic-int {
+        rockchip,pins = <0 5 RK_FUNC_GPIO &pcfg_pull_up>;
+    };
+};
