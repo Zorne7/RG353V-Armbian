@@ -70,7 +70,7 @@ then
     do
         rm -rf output/logs
         ./compile.sh $i
-        img=$(find output -name "Armbian-*_R36s_*.img")
+        img=$(find output -name "Armbian-*_${device}_*.img")
         log=$(find output -name log-build-*.log)
         id=$(echo $log| sed -E 's|.*log-build-(.*)\.log|\1|')
         
