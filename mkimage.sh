@@ -74,7 +74,7 @@ then
         log=$(find output -name log-build-*.log)
         id=$(echo $log| sed -E 's|.*log-build-(.*)\.log|\1|')
         
-        #armbian-r36s-noble-minimal
+        #armbian-${device}-noble-minimal
         device=$(echo $i|cut -d- -f2)
         base=$(echo $i|cut -d- -f3)
         type=$(echo $i|cut -d- -f4)
