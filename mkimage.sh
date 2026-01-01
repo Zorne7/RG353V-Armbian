@@ -1,9 +1,6 @@
 #!/bin/bash
 
-if [[ "$1" == "clean" ]] 
-then
-
-    [[ -d "localbuild" ]] && cd localbuild || exit 0
+unbind() {
     OIFS="$IFS"
     IFS=$'\n'
     for mp in $(mount | grep "$(pwd)" |cut -d' ' -f3-|sed -E 's|(.*) type .*|\1|')
@@ -12,23 +9,7 @@ then
         sudo umount "${mp}" || exit 1
     done
     IFS="$OIFS"
-    cd ..
-
-    sudo rm -rf localbuild/
-    exit 0
-fi
-
-[[ ! -d "localbuild" ]] && mkdir localbuild
-
-cd localbuild
-OIFS="$IFS"
-IFS=$'\n'
-for mp in $(mount | grep "$(pwd)" |cut -d' ' -f3-|sed -E 's|(.*) type .*|\1|')
-do
-    echo unbind ${mp}
-    sudo umount "${mp}" || exit 1
-done
-IFS="$OIFS"
+}
 
 prep() {
     echo prep
@@ -41,6 +22,22 @@ prep() {
     #mkdir release
     [[ "$1" == "prep" ]] && exit 
 }
+
+if [[ "$1" == "clean" ]] 
+then
+
+    [[ -d "localbuild" ]] && cd localbuild || exit 0
+    unbind
+    cd ..
+
+    sudo rm -rf localbuild/
+    exit 0
+fi
+
+[[ ! -d "localbuild" ]] && mkdir localbuild
+
+cd localbuild
+unbind
 
 #rebind
 OIFS="$IFS"
@@ -71,7 +68,7 @@ then
         rm -rf output/logs
         ./compile.sh $i
         
-	device=$(echo $i|cut -d- -f2)
+        device=$(echo $i|cut -d- -f2)
 
         img=$(find output -name "Armbian-*_${device}_*.img")
         log=$(find output -name log-build-*.log)
@@ -97,11 +94,4 @@ else
 fi
 
 
-OIFS="$IFS"
-IFS=$'\n'
-for mp in $(mount | grep "$(pwd)" |cut -d' ' -f3-|sed -E 's|(.*) type .*|\1|')
-do
-    #echo unbind2 ${mp}
-    sudo umount "${mp}" && rm ${mp} || exit 1
-done
-IFS="$OIFS"
+unbind
