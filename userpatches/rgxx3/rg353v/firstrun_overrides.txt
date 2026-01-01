@@ -1,0 +1,6 @@
+rootpass=rg353v
+FancyUserName=RG353V
+username=rg353v
+userpass=rg353v
+ssid=WiFi
+wifipass=asuhdude
