@@ -3,38 +3,17 @@
 set -e
 
 # -----------------------------
-# CLEAN
+# FUNCTION: unbind files
 # -----------------------------
-if [[ "$1" == "clean" ]]; then
-    [[ -d "localbuild" ]] && cd localbuild || exit 0
-
-    OIFS="$IFS"
+unbind() {
+	OIFS="$IFS"
     IFS=$'\n'
     for mp in $(mount | grep "$(pwd)" | cut -d' ' -f3- | sed -E 's|(.*) type .*|\1|'); do
         echo "unbind $mp"
         sudo umount "$mp" || exit 1
     done
     IFS="$OIFS"
-
-    cd ..
-    sudo rm -rf localbuild/
-    exit 0
-fi
-
-# -----------------------------
-# PREPARE localbuild/
-# -----------------------------
-[[ ! -d "localbuild" ]] && mkdir localbuild
-cd localbuild
-
-# Unmount previous mounts
-OIFS="$IFS"
-IFS=$'\n'
-for mp in $(mount | grep "$(pwd)" | cut -d' ' -f3- | sed -E 's|(.*) type .*|\1|'); do
-    echo "unbind $mp"
-    sudo umount "$mp" || exit 1
-done
-IFS="$OIFS"
+}
 
 # -----------------------------
 # FUNCTION: prep Armbian build system
@@ -51,6 +30,26 @@ prep() {
 
     [[ "$1" == "prep" ]] && exit
 }
+
+# -----------------------------
+# CLEAN
+# -----------------------------
+if [[ "$1" == "clean" ]]; then
+    [[ -d "localbuild" ]] && cd localbuild || exit 0
+	unbind
+    cd ..
+    sudo rm -rf localbuild/
+    exit 0
+fi
+
+# -----------------------------
+# PREPARE localbuild/
+# -----------------------------
+[[ ! -d "localbuild" ]] && mkdir localbuild
+cd localbuild
+
+# Unmount previous mounts
+unbind
 
 # -----------------------------
 # CREATE DIRECTORY STRUCTURE BEFORE BIND
@@ -136,10 +135,5 @@ fi
 # -----------------------------
 # FINAL UNBIND
 # -----------------------------
-OIFS="$IFS"
-IFS=$'\n'
-for mp in $(mount | grep "$(pwd)" | cut -d' ' -f3- | sed -E 's|(.*) type .*|\1|'); do
-    sudo umount "$mp" && rm "$mp" || exit 1
-done
-IFS="$OIFS"
+unbind
 
