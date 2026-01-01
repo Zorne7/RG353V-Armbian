@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -eu
+
+# FUNCTIONS
 unbind() {
     OIFS="$IFS"
     IFS=$'\n'
@@ -23,6 +26,7 @@ prep() {
     [[ "$1" == "prep" ]] && exit 
 }
 
+# MAIN
 if [[ "$1" == "clean" ]] 
 then
 
