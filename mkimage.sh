@@ -22,8 +22,6 @@ prep() {
     wget -q -nv "$LatestArmbianURL" -O${LatestArmbianVer}.tar.gz
     tar --strip-components=1 --exclude=.gitignore --exclude=.git --exclude=README.md -xf ${LatestArmbianVer}.tar.gz
     rm -f ${LatestArmbianVer}.tar.gz
-    #mkdir release
-    [[ "$1" == "prep" ]] && exit 
 }
 
 # MAIN
@@ -59,7 +57,11 @@ do
 done
 IFS="$OIFS"
 
-[[ "$1" == "prep" ]] && prep 
+if [[ "$1" == "prep" ]]
+then
+    prep
+    exit 0
+fi 
 
 [[ ! -f "compile.sh" ]] && prep
 
